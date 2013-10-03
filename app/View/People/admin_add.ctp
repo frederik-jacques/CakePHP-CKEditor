@@ -3,12 +3,9 @@
 	<fieldset>
 		<legend><?php echo __('Admin Add Person'); ?></legend>
 	<?php
-		echo $this->Form->input('firstname', array('required' => false));
-		echo $this->Form->input('lastname', array('required' => false));
-		echo $this->Form->input('biography', array(
-            'required' => false,
-            'class' => 'ckeditor'
-        ));
+		echo $this->Form->input('firstname');
+		echo $this->Form->input('lastname');
+		echo $this->Form->input('biography');
 	?>
 	</fieldset>
 <?php echo $this->Form->end(__('Submit')); ?>

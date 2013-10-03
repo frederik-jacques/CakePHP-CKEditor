@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/cakeCK.iml" filepath="$PROJECT_DIR$/.idea/cakeCK.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/CakePHP-CKEditor.iml" filepath="$PROJECT_DIR$/.idea/CakePHP-CKEditor.iml" />
     </modules>
   </component>
 </project>

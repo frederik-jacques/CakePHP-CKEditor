@@ -10,12 +10,13 @@
  * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP Project
  * @since         CakePHP(tm) v 1.2.0.5432
- * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
+ * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
+
 App::uses('Debugger', 'Utility');
 
 /**
- * DebugggerTestCaseDebuggger class
+ * DebuggerTestCaseDebugger class
  *
  * @package       Cake.Test.Case.Utility
  */
@@ -333,6 +334,8 @@ object(View) {
 	response => object(CakeResponse) {}
 	elementCache => 'default'
 	elementCacheSettings => array()
+	Html => object(HtmlHelper) {}
+	Form => object(FormHelper) {}
 	int => (int) 2
 	float => (float) 1.333
 
@@ -357,7 +360,6 @@ TEXT;
 	)
 	[protected] _scripts => array()
 	[protected] _paths => array()
-	[protected] _helpersLoaded => false
 	[protected] _parents => array()
 	[protected] _current => null
 	[protected] _currentType => ''
@@ -407,6 +409,11 @@ TEXT;
 false
 TEXT;
 		$this->assertTextEquals($expected, $result);
+
+		$file = fopen('php://output', 'w');
+		fclose($file);
+		$result = Debugger::exportVar($file);
+		$this->assertTextEquals('unknown', $result);
 	}
 
 /**
@@ -482,8 +489,11 @@ TEXT;
 		ob_start();
 		Debugger::dump($var);
 		$result = ob_get_clean();
+
+		$open = php_sapi_name() == 'cli' ? "\n" : '<pre>';
+		$close = php_sapi_name() == 'cli' ? "\n" : '</pre>';
 		$expected = <<<TEXT
-<pre>array(
+{$open}array(
 	'People' => array(
 		(int) 0 => array(
 			'name' => 'joeseph',
@@ -496,7 +506,7 @@ TEXT;
 			'hair' => 'black'
 		)
 	)
-)</pre>
+){$close}
 TEXT;
 		$this->assertTextEquals($expected, $result);
 	}

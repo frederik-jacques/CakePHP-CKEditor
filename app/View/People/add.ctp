@@ -5,7 +5,10 @@
 	<?php
 		echo $this->Form->input('firstname');
 		echo $this->Form->input('lastname');
-		echo $this->Form->input('biography');
+        echo $this->Form->textarea('biography', array(
+            'class' => 'ckeditor',
+            'required' => false
+        ));
 	?>
 	</fieldset>
 <?php echo $this->Form->end(__('Submit')); ?>

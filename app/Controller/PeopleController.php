@@ -4,11 +4,16 @@ App::uses('AppController', 'Controller');
  * People Controller
  *
  * @property Person $Person
- * @property DebugKit.ToolbarComponent $DebugKit.Toolbar
+ * @property PaginatorComponent $Paginator
  */
 class PeopleController extends AppController {
 
-
+/**
+ * Components
+ *
+ * @var array
+ */
+	public $components = array('Paginator');
 
 /**
  * index method
@@ -17,7 +22,7 @@ class PeopleController extends AppController {
  */
 	public function index() {
 		$this->Person->recursive = 0;
-		$this->set('people', $this->paginate());
+		$this->set('people', $this->Paginator->paginate());
 	}
 
 /**
@@ -44,8 +49,8 @@ class PeopleController extends AppController {
 		if ($this->request->is('post')) {
 			$this->Person->create();
 			if ($this->Person->save($this->request->data)) {
-				$this->Session->setFlash(__('The person has been saved'));
-				$this->redirect(array('action' => 'index'));
+				$this->Session->setFlash(__('The person has been saved.'));
+				return $this->redirect(array('action' => 'index'));
 			} else {
 				$this->Session->setFlash(__('The person could not be saved. Please, try again.'));
 			}
@@ -63,10 +68,10 @@ class PeopleController extends AppController {
 		if (!$this->Person->exists($id)) {
 			throw new NotFoundException(__('Invalid person'));
 		}
-		if ($this->request->is('post') || $this->request->is('put')) {
+		if ($this->request->is(array('post', 'put'))) {
 			if ($this->Person->save($this->request->data)) {
-				$this->Session->setFlash(__('The person has been saved'));
-				$this->redirect(array('action' => 'index'));
+				$this->Session->setFlash(__('The person has been saved.'));
+				return $this->redirect(array('action' => 'index'));
 			} else {
 				$this->Session->setFlash(__('The person could not be saved. Please, try again.'));
 			}
@@ -90,11 +95,11 @@ class PeopleController extends AppController {
 		}
 		$this->request->onlyAllow('post', 'delete');
 		if ($this->Person->delete()) {
-			$this->Session->setFlash(__('Person deleted'));
-			$this->redirect(array('action' => 'index'));
+			$this->Session->setFlash(__('The person has been deleted.'));
+		} else {
+			$this->Session->setFlash(__('The person could not be deleted. Please, try again.'));
 		}
-		$this->Session->setFlash(__('Person was not deleted'));
-		$this->redirect(array('action' => 'index'));
+		return $this->redirect(array('action' => 'index'));
 	}
 
 /**
@@ -104,7 +109,7 @@ class PeopleController extends AppController {
  */
 	public function admin_index() {
 		$this->Person->recursive = 0;
-		$this->set('people', $this->paginate());
+		$this->set('people', $this->Paginator->paginate());
 	}
 
 /**
@@ -131,8 +136,8 @@ class PeopleController extends AppController {
 		if ($this->request->is('post')) {
 			$this->Person->create();
 			if ($this->Person->save($this->request->data)) {
-				$this->Session->setFlash(__('The person has been saved'));
-				$this->redirect(array('action' => 'index'));
+				$this->Session->setFlash(__('The person has been saved.'));
+				return $this->redirect(array('action' => 'index'));
 			} else {
 				$this->Session->setFlash(__('The person could not be saved. Please, try again.'));
 			}
@@ -150,10 +155,10 @@ class PeopleController extends AppController {
 		if (!$this->Person->exists($id)) {
 			throw new NotFoundException(__('Invalid person'));
 		}
-		if ($this->request->is('post') || $this->request->is('put')) {
+		if ($this->request->is(array('post', 'put'))) {
 			if ($this->Person->save($this->request->data)) {
-				$this->Session->setFlash(__('The person has been saved'));
-				$this->redirect(array('action' => 'index'));
+				$this->Session->setFlash(__('The person has been saved.'));
+				return $this->redirect(array('action' => 'index'));
 			} else {
 				$this->Session->setFlash(__('The person could not be saved. Please, try again.'));
 			}
@@ -177,10 +182,9 @@ class PeopleController extends AppController {
 		}
 		$this->request->onlyAllow('post', 'delete');
 		if ($this->Person->delete()) {
-			$this->Session->setFlash(__('Person deleted'));
-			$this->redirect(array('action' => 'index'));
+			$this->Session->setFlash(__('The person has been deleted.'));
+		} else {
+			$this->Session->setFlash(__('The person could not be deleted. Please, try again.'));
 		}
-		$this->Session->setFlash(__('Person was not deleted'));
-		$this->redirect(array('action' => 'index'));
-	}
-}
+		return $this->redirect(array('action' => 'index'));
+	}}

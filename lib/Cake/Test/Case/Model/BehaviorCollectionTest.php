@@ -17,7 +17,7 @@
  * @link          http://cakephp.org CakePHP(tm) Project
  * @package       Cake.Test.Case.Model
  * @since         1.2
- * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
+ * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
 App::uses('AppModel', 'Model');
@@ -84,7 +84,7 @@ class TestBehavior extends ModelBehavior {
  * @param boolean $primary
  * @return void
  */
-	public function afterFind(Model $model, $results, $primary) {
+	public function afterFind(Model $model, $results, $primary = false) {
 		$settings = $this->settings[$model->alias];
 		if (!isset($settings['afterFind']) || $settings['afterFind'] === 'off') {
 			return parent::afterFind($model, $results, $primary);
@@ -104,13 +104,15 @@ class TestBehavior extends ModelBehavior {
 /**
  * beforeSave method
  *
- * @param Model $model
- * @return void
+ * @param Model $model Model using this behavior
+ * @param array $options Options passed from Model::save().
+ * @return mixed False if the operation should abort. Any other result will continue.
+ * @see Model::save()
  */
-	public function beforeSave(Model $model) {
+	public function beforeSave(Model $model, $options = array()) {
 		$settings = $this->settings[$model->alias];
 		if (!isset($settings['beforeSave']) || $settings['beforeSave'] === 'off') {
-			return parent::beforeSave($model);
+			return parent::beforeSave($model, $options);
 		}
 		switch ($settings['beforeSave']) {
 			case 'on':
@@ -128,12 +130,13 @@ class TestBehavior extends ModelBehavior {
  *
  * @param Model $model
  * @param boolean $created
+ * @param array $options Options passed from Model::save().
  * @return void
  */
-	public function afterSave(Model $model, $created) {
+	public function afterSave(Model $model, $created, $options = array()) {
 		$settings = $this->settings[$model->alias];
 		if (!isset($settings['afterSave']) || $settings['afterSave'] === 'off') {
-			return parent::afterSave($model, $created);
+			return parent::afterSave($model, $created, $options);
 		}
 		$string = 'modified after';
 		if ($created) {
@@ -142,28 +145,30 @@ class TestBehavior extends ModelBehavior {
 		switch ($settings['afterSave']) {
 			case 'on':
 				$model->data[$model->alias]['aftersave'] = $string;
-			break;
+				break;
 			case 'test':
 				unset($model->data[$model->alias]['name']);
-			break;
+				break;
 			case 'test2':
 				return false;
 			case 'modify':
 				$model->data[$model->alias]['name'] .= ' ' . $string;
-			break;
+				break;
 		}
 	}
 
 /**
- * beforeValidate method
+ * beforeValidate Callback
  *
- * @param Model $model
- * @return void
+ * @param Model $Model Model invalidFields was called on.
+ * @param array $options Options passed from Model::save().
+ * @return boolean
+ * @see Model::save()
  */
-	public function beforeValidate(Model $model) {
+	public function beforeValidate(Model $model, $options = array()) {
 		$settings = $this->settings[$model->alias];
 		if (!isset($settings['validate']) || $settings['validate'] === 'off') {
-			return parent::beforeValidate($model);
+			return parent::beforeValidate($model, $options);
 		}
 		switch ($settings['validate']) {
 			case 'on':
@@ -184,7 +189,7 @@ class TestBehavior extends ModelBehavior {
  * afterValidate method
  *
  * @param Model $model
- * @param bool $cascade
+ * @param boolean $cascade
  * @return void
  */
 	public function afterValidate(Model $model) {
@@ -205,7 +210,7 @@ class TestBehavior extends ModelBehavior {
  * beforeDelete method
  *
  * @param Model $model
- * @param bool $cascade
+ * @param boolean $cascade
  * @return void
  */
 	public function beforeDelete(Model $model, $cascade = true) {
@@ -241,7 +246,7 @@ class TestBehavior extends ModelBehavior {
 		switch ($settings['afterDelete']) {
 			case 'on':
 				echo 'afterDelete success';
-			break;
+				break;
 		}
 	}
 
@@ -277,7 +282,7 @@ class TestBehavior extends ModelBehavior {
  * testMethod method
  *
  * @param Model $model
- * @param bool $param
+ * @param boolean $param
  * @return void
  */
 	public function testMethod(Model $model, $param = true) {
@@ -349,7 +354,7 @@ class Test2Behavior extends TestBehavior {
  *
  * @package       Cake.Test.Case.Model
  */
-class Test3Behavior extends TestBehavior{
+class Test3Behavior extends TestBehavior {
 }
 
 /**
@@ -357,7 +362,7 @@ class Test3Behavior extends TestBehavior{
  *
  * @package       Cake.Test.Case.Model
  */
-class Test4Behavior extends ModelBehavior{
+class Test4Behavior extends ModelBehavior {
 
 	public function setup(Model $model, $config = null) {
 		$model->bindModel(
@@ -372,7 +377,7 @@ class Test4Behavior extends ModelBehavior{
  *
  * @package       Cake.Test.Case.Model
  */
-class Test5Behavior extends ModelBehavior{
+class Test5Behavior extends ModelBehavior {
 
 	public function setup(Model $model, $config = null) {
 		$model->bindModel(
@@ -387,7 +392,7 @@ class Test5Behavior extends ModelBehavior{
  *
  * @package       Cake.Test.Case.Model
  */
-class Test6Behavior extends ModelBehavior{
+class Test6Behavior extends ModelBehavior {
 
 	public function setup(Model $model, $config = null) {
 		$model->bindModel(
@@ -402,7 +407,7 @@ class Test6Behavior extends ModelBehavior{
  *
  * @package       Cake.Test.Case.Model
  */
-class Test7Behavior extends ModelBehavior{
+class Test7Behavior extends ModelBehavior {
 
 	public function setup(Model $model, $config = null) {
 		$model->bindModel(

@@ -15,7 +15,7 @@
  * @link          http://book.cakephp.org/2.0/en/development/testing.html CakePHP(tm) Tests
  * @package       Cake.Test.Case.View
  * @since         CakePHP(tm) v 1.2.0.4206
- * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
+ * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
 App::uses('View', 'View');
@@ -309,7 +309,7 @@ class HelperTest extends CakeTestCase {
 /**
  * test setEntity with setting a scope.
  *
- * @return
+ * @return void
  */
 	public function testSetEntityScoped() {
 		$this->Helper->setEntity('HelperTestPost', true);
@@ -600,30 +600,34 @@ class HelperTest extends CakeTestCase {
 	public function testAssetTimestamp() {
 		Configure::write('Foo.bar', 'test');
 		Configure::write('Asset.timestamp', false);
-		$result = $this->Helper->assetTimestamp(CSS_URL . 'cake.generic.css');
-		$this->assertEquals(CSS_URL . 'cake.generic.css', $result);
+		$result = $this->Helper->assetTimestamp(Configure::read('App.cssBaseUrl') . 'cake.generic.css');
+		$this->assertEquals(Configure::read('App.cssBaseUrl') . 'cake.generic.css', $result);
 
 		Configure::write('Asset.timestamp', true);
 		Configure::write('debug', 0);
-		$result = $this->Helper->assetTimestamp(CSS_URL . 'cake.generic.css');
-		$this->assertEquals(CSS_URL . 'cake.generic.css', $result);
+
+		$result = $this->Helper->assetTimestamp('/%3Cb%3E/cake.generic.css');
+		$this->assertEquals('/%3Cb%3E/cake.generic.css', $result);
+
+		$result = $this->Helper->assetTimestamp(Configure::read('App.cssBaseUrl') . 'cake.generic.css');
+		$this->assertEquals(Configure::read('App.cssBaseUrl') . 'cake.generic.css', $result);
 
 		Configure::write('Asset.timestamp', true);
 		Configure::write('debug', 2);
-		$result = $this->Helper->assetTimestamp(CSS_URL . 'cake.generic.css');
-		$this->assertRegExp('/' . preg_quote(CSS_URL . 'cake.generic.css?', '/') . '[0-9]+/', $result);
+		$result = $this->Helper->assetTimestamp(Configure::read('App.cssBaseUrl') . 'cake.generic.css');
+		$this->assertRegExp('/' . preg_quote(Configure::read('App.cssBaseUrl') . 'cake.generic.css?', '/') . '[0-9]+/', $result);
 
 		Configure::write('Asset.timestamp', 'force');
 		Configure::write('debug', 0);
-		$result = $this->Helper->assetTimestamp(CSS_URL . 'cake.generic.css');
-		$this->assertRegExp('/' . preg_quote(CSS_URL . 'cake.generic.css?', '/') . '[0-9]+/', $result);
+		$result = $this->Helper->assetTimestamp(Configure::read('App.cssBaseUrl') . 'cake.generic.css');
+		$this->assertRegExp('/' . preg_quote(Configure::read('App.cssBaseUrl') . 'cake.generic.css?', '/') . '[0-9]+/', $result);
 
-		$result = $this->Helper->assetTimestamp(CSS_URL . 'cake.generic.css?someparam');
-		$this->assertEquals(CSS_URL . 'cake.generic.css?someparam', $result);
+		$result = $this->Helper->assetTimestamp(Configure::read('App.cssBaseUrl') . 'cake.generic.css?someparam');
+		$this->assertEquals(Configure::read('App.cssBaseUrl') . 'cake.generic.css?someparam', $result);
 
 		$this->Helper->request->webroot = '/some/dir/';
-		$result = $this->Helper->assetTimestamp('/some/dir/' . CSS_URL . 'cake.generic.css');
-		$this->assertRegExp('/' . preg_quote(CSS_URL . 'cake.generic.css?', '/') . '[0-9]+/', $result);
+		$result = $this->Helper->assetTimestamp('/some/dir/' . Configure::read('App.cssBaseUrl') . 'cake.generic.css');
+		$this->assertRegExp('/' . preg_quote(Configure::read('App.cssBaseUrl') . 'cake.generic.css?', '/') . '[0-9]+/', $result);
 	}
 
 /**
@@ -640,13 +644,13 @@ class HelperTest extends CakeTestCase {
 			),
 			array('fullBase' => true)
 		);
-		$this->assertEquals(FULL_BASE_URL . '/js/post.js', $result);
+		$this->assertEquals(Router::fullBaseUrl() . '/js/post.js', $result);
 
 		$result = $this->Helper->assetUrl('foo.jpg', array('pathPrefix' => 'img/'));
 		$this->assertEquals('img/foo.jpg', $result);
 
 		$result = $this->Helper->assetUrl('foo.jpg', array('fullBase' => true));
-		$this->assertEquals(FULL_BASE_URL . '/foo.jpg', $result);
+		$this->assertEquals(Router::fullBaseUrl() . '/foo.jpg', $result);
 
 		$result = $this->Helper->assetUrl('style', array('ext' => '.css'));
 		$this->assertEquals('style.css', $result);
@@ -656,6 +660,25 @@ class HelperTest extends CakeTestCase {
 
 		$result = $this->Helper->assetUrl('foo.jpg?one=two&three=four');
 		$this->assertEquals('foo.jpg?one=two&amp;three=four', $result);
+
+		$result = $this->Helper->assetUrl('dir/big+tall/image', array('ext' => '.jpg'));
+		$this->assertEquals('dir/big%2Btall/image.jpg', $result);
+	}
+
+/**
+ * Test assetUrl with no rewriting.
+ *
+ * @return void
+ */
+	public function testAssetUrlNoRewrite() {
+		$this->Helper->request->addPaths(array(
+			'base' => '/cake_dev/index.php',
+			'webroot' => '/cake_dev/app/webroot/',
+			'here' => '/cake_dev/index.php/tasks',
+		));
+		$result = $this->Helper->assetUrl('img/cake.icon.png', array('fullBase' => true));
+		$expected = FULL_BASE_URL . '/cake_dev/app/webroot/img/cake.icon.png';
+		$this->assertEquals($expected, $result);
 	}
 
 /**
@@ -685,8 +708,8 @@ class HelperTest extends CakeTestCase {
 		$this->Helper->webroot = '';
 		Configure::write('Asset.timestamp', 'force');
 
-		$result = $this->Helper->assetUrl('cake.generic.css', array('pathPrefix' => CSS_URL));
-		$this->assertRegExp('/' . preg_quote(CSS_URL . 'cake.generic.css?', '/') . '[0-9]+/', $result);
+		$result = $this->Helper->assetUrl('cake.generic.css', array('pathPrefix' => Configure::read('App.cssBaseUrl')));
+		$this->assertRegExp('/' . preg_quote(Configure::read('App.cssBaseUrl') . 'cake.generic.css?', '/') . '[0-9]+/', $result);
 	}
 
 /**
@@ -952,8 +975,7 @@ class HelperTest extends CakeTestCase {
 		$Helper->OtherHelper;
 
 		$result = $this->View->Helpers->enabled();
-		$expected = array();
-		$this->assertEquals($expected, $result, 'Helper helpers were attached to the collection.');
+		$this->assertEquals(array(), $result, 'Helper helpers were attached to the collection.');
 	}
 
 /**

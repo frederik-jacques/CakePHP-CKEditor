@@ -17,7 +17,7 @@
  * @link          http://cakephp.org CakePHP(tm) Project
  * @package       Cake.Model
  * @since         CakePHP(tm) v 0.10.x.1402
- * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
+ * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
 App::uses('DataSource', 'Model/Datasource');
@@ -86,8 +86,7 @@ class ConnectionManager {
 		}
 
 		if (!empty(self::$_dataSources[$name])) {
-			$return = self::$_dataSources[$name];
-			return $return;
+			return self::$_dataSources[$name];
 		}
 
 		if (empty(self::$_connectionsEnum[$name])) {
